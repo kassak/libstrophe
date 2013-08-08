@@ -8,15 +8,15 @@ License:	MIT/GPLv3
 URL:		http://strophe.im/libstrophe/
 Source0:	libstrophe_git.tar.gz
 
-BuildRequires:	expat-devel
-Requires:		expat
+BuildRequires:	libxml2-devel
+Requires:		libxml2
 
 %description
 XMPP library in C
 
 %prep
 %setup -n libstrophe
-./bootstrap.sh
+cmake
 
 %build
 %configure
@@ -26,7 +26,7 @@ make %{?_smp_mflags}
 make install DESTDIR=%{buildroot}
 
 %files
-%{_libdir}/libstrophe.a
+%{_libdir}/libstrophe.so
 %{_includedir}/strophe.h
 
 %changelog
