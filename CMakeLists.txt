@@ -85,7 +85,10 @@ endif(USE_OPENSSL)
 
 if(NOT WIN32)
    FIND_LIBRARY(RESOLV_LIBRARY NAMES resolv)
-  target_link_libraries(strophe ${RESOLV_LIBRARY})
+   target_link_libraries(strophe ${RESOLV_LIBRARY})
+else(NOT WIN32)
+   target_link_libraries(strophe WS2_32)
+   target_link_libraries(strophe Winmm)
 endif(NOT WIN32)
 
 add_subdirectory(examples)

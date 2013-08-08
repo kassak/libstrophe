@@ -23,6 +23,8 @@
 #include <stdarg.h>
 #ifndef _WIN32
 #include <stdint.h>
+#else
+#define va_copy(dest, src) ((dest) = (src))
 #endif
 
 
