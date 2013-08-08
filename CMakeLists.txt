@@ -34,6 +34,7 @@ set (SOURCES
   src/sha1.c
   src/sock.c
   src/stanza.c
+  src/snprintf.c
   src/thread.c
 #  src/tls_dummy.c
 #  src/tls_gnutls.c
@@ -60,24 +61,31 @@ endif(USE_WINSSL)
 
 message(${SOURCES})
 
-add_library (libstrophe SHARED ${SOURCES})
+add_library (strophe SHARED ${SOURCES})
 
 if(USE_LIBEXPAT)
   find_package(LibExpat REQUIRED)
   include_directories(${LIBEXPAT_INCLUDE_DIR})
-  target_link_libraries(libstrophe ${LIBEXPAT_LIBRARIES})
+  target_link_libraries(strophe ${LIBEXPAT_LIBRARIES})
 elseif(USE_LIBXML2)
   find_package(LibXml2 REQUIRED)
   include_directories(${LIBXML2_INCLUDE_DIR})
-  target_link_libraries(libstrophe ${LIBXML2_LIBRARIES})
+  target_link_libraries(strophe ${LIBXML2_LIBRARIES})
 endif(USE_LIBEXPAT)
 
 if(USE_OPENSSL)
   find_package(OpenSSL REQUIRED)
   include_directories(${OPENSSL_INCLUDE_DIR})
-  target_link_libraries(libstrophe ${OPENSSL_LIBRARIES})
+  target_link_libraries(strophe ${OPENSSL_LIBRARIES})
 elseif(USE_GNUTLS)
   find_package(GnuTLS REQUIRED)
   include_directories(${GNUTLS_INCLUDE_DIR})
-  target_link_libraries(libstrophe ${GNUTLS_LIBRARIES})
+  target_link_libraries(strophe ${GNUTLS_LIBRARIES})
 endif(USE_OPENSSL)
+
+if(NOT WIN32)
+   FIND_LIBRARY(RESOLV_LIBRARY NAMES resolv)
+  target_link_libraries(strophe ${RESOLV_LIBRARY})
+endif(NOT WIN32)
+
+add_subdirectory(examples)
