@@ -28,18 +28,10 @@ set (SOURCES
   src/md5.c
   src/oocontext.cpp
   src/oostanza.cpp
-#  src/parser_expat.c
-#  src/parser_libxml2.c
   src/sasl.c
-  src/sha1.c
   src/sock.c
   src/stanza.c
   src/snprintf.c
-  src/thread.c
-#  src/tls_dummy.c
-#  src/tls_gnutls.c
-#  src/tls_openssl.c
-#  src/tls_schannel.c
   src/util.c
 )
 
