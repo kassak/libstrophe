@@ -1,7 +1,7 @@
 /* event.c
 ** strophe XMPP client library -- event loop and management
 **
-** Copyright (C) 2005-2009 Collecta, Inc. 
+** Copyright (C) 2005-2009 Collecta, Inc.
 **
 **  This software is provided AS-IS with no warranty, either express
 **  or implied.
@@ -17,15 +17,15 @@
  */
 
 /** @defgroup EventLoop Event loop
- *  These functions manage the Strophe event loop.  
- *  
+ *  These functions manage the Strophe event loop.
+ *
  *  Simple tools can use xmpp_run() and xmpp_stop() to manage the life
  *  cycle of the program.  A common idiom is to set up a few initial
  *  event handers, call xmpp_run(), and then respond and react to
  *  events as they come in.  At some point, one of the handlers will
  *  call xmpp_stop() to quit the event loop which leads to the program
  *  terminating.
- * 
+ *
  *  More complex programs will have their own event loops, and should
  *  ensure that xmpp_run_once() is called regularly from there.  For
  *  example, a GUI program will already include an event loop to
@@ -73,6 +73,32 @@
  *  @ingroup EventLoop
  */
 void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
+{
+   xmpp_run_once_foreign(ctx, timeout, 0, 0, 0, 0);
+}
+
+/** Run the event loop once.
+ *  This function will run send any data that has been queued by
+ *  xmpp_send and related functions and run through the Strophe even
+ *  loop a single time, and will not wait more than timeout
+ *  milliseconds for events.  This is provided to support integration
+ *  with event loops outside the library, and if used, should be
+ *  called regularly to achieve low latency event handling.
+ *
+ *  Also will pass additional sockets to select to unblock thread
+ *  if something happened on foreign sockets.
+ *
+ *  @param ctx a Strophe context object
+ *  @param timeout time to wait for events in milliseconds
+ *  @param f_rfds foreign read sockets, can be NULL
+ *  @param f_rfds_size number of foreign read sockets
+ *  @param f_wfds foreign write sockets, can be NULL
+ *  @param f_wfds_size number of foreign write sockets
+ *
+ *  @ingroup EventLoop
+ */
+void xmpp_run_once_foreign(xmpp_ctx_t *ctx, const unsigned long timeout,
+     sock_t * f_rfds, int f_rfds_size, sock_t * f_wfds, int f_wfds_size)
 {
     xmpp_connlist_t *connitem;
     xmpp_conn_t *conn;
@@ -164,7 +190,7 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 	    conn->error = ECONNABORTED;
 	    conn_disconnect(conn);
 	}
-	
+
 	connitem = connitem->next;
     }
 
@@ -176,7 +202,7 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 
 
     /* fire any ready timed handlers, then
-       make sure we don't wait past the time when timed handlers need 
+       make sure we don't wait past the time when timed handlers need
        to be called */
     next = handler_fire_timed(ctx);
 
@@ -184,21 +210,21 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     tv.tv_sec = usec / 1000000;
     tv.tv_usec = usec % 1000000;
 
-    FD_ZERO(&rfds); 
+    FD_ZERO(&rfds);
     FD_ZERO(&wfds);
 
     /* find events to watch */
     connitem = ctx->connlist;
     while (connitem) {
 	conn = connitem->conn;
-	
+
 	switch (conn->state) {
 	case XMPP_STATE_CONNECTING:
 	    /* connect has been called and we're waiting for it to complete */
 	    /* connection will give us write or error events */
-	    
+
 	    /* make sure the timeout hasn't expired */
-	    if (time_elapsed(conn->timeout_stamp, time_stamp()) <= 
+	    if (time_elapsed(conn->timeout_stamp, time_stamp()) <=
 		conn->connect_timeout)
 		FD_SET(conn->sock, &wfds);
 	    else {
@@ -215,15 +241,26 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 	default:
 	    break;
 	}
-	
+
 	/* Check if there is something in the SSL buffer. */
 	if (conn->tls) {
 	    tls_read_bytes += tls_pending(conn->tls);
 	}
-	
+
 	if (conn->sock > max) max = conn->sock;
 
 	connitem = connitem->next;
+    }
+
+    /* handle foreign fds for waiting data from them */
+    {
+    int fi;
+    if(f_rfds)
+       for(fi = 0; fi < f_rfds_size; ++fi)
+          FD_SET(f_rfds[fi], &rfds);
+    if(f_wfds)
+       for(fi = 0; fi < f_wfds_size; ++fi)
+          FD_SET(f_wfds[fi], &wfds);
     }
 
     /* check for events */
@@ -232,11 +269,11 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
     /* select errored */
     if (ret < 0) {
 	if (!sock_is_recoverable(sock_error()))
-	    xmpp_error(ctx, "xmpp", "event watcher internal error %d", 
+	    xmpp_error(ctx, "xmpp", "event watcher internal error %d",
 		       sock_error());
 	return;
     }
-    
+
     /* no events happened */
     if (ret == 0 && tls_read_bytes == 0) return;
 
@@ -261,7 +298,7 @@ void xmpp_run_once(xmpp_ctx_t *ctx, const unsigned long timeout)
 		conn->state = XMPP_STATE_CONNECTED;
 		xmpp_debug(ctx, "xmpp", "connection successful");
 
-		
+
 		/* send stream init */
 		conn_open_stream(conn);
 	    }
