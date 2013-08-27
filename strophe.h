@@ -128,6 +128,10 @@ xmpp_ctx_t *xmpp_ctx_new(const xmpp_mem_t * const mem,
 			     const xmpp_log_t * const log);
 void xmpp_ctx_free(xmpp_ctx_t * const ctx);
 
+void *xmpp_alloc(const xmpp_ctx_t * const ctx, const size_t size);
+void xmpp_free(const xmpp_ctx_t * const ctx, void *p);
+void *xmpp_realloc(const xmpp_ctx_t * const ctx, void *p, const size_t size);
+
 struct _xmpp_mem_t {
     void *(*alloc)(const size_t size, void * const userdata);
     void (*free)(void *p, void * const userdata);
