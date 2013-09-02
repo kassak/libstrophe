@@ -49,8 +49,8 @@ typedef struct _xmpp_connlist_t {
 } xmpp_connlist_t;
 
 struct _xmpp_ctx_t {
-    const xmpp_mem_t *mem;
-    const xmpp_log_t *log;
+    const occam_allocator_t *mem;
+    const occam_logger_t *log;
 
     xmpp_loop_status_t loop_status;
     xmpp_connlist_t *connlist;
@@ -64,7 +64,7 @@ void *xmpp_realloc(const xmpp_ctx_t * const ctx, void *p,
 char *xmpp_strdup(const xmpp_ctx_t * const ctx, const char * const s);
 
 void xmpp_log(const xmpp_ctx_t * const ctx, 
-	      const xmpp_log_level_t level,
+	      const occam_log_level_t level,
 	      const char * const area,
 	      const char * const fmt, 
 	      va_list ap);

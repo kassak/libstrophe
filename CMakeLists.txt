@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (libstrophe)
 
+set(CMAKE_C_FLAGS "-Wimplicit")
+set(CMAKE_C_FLAGS_DEBUG "-Wimplicit")
+set(CMAKE_C_FLAGS_RELEASE "-Wimplicit")
+
 if(WIN32)
   set(NWIN32 OFF)
 else(WIN32)
@@ -16,6 +20,7 @@ OPTION(USE_LIBXML2 "Use libxml2 parser" ON)
 OPTION(USE_LIBEXPAT "Use expat parser" OFF)
 
 include_directories(.)
+include_directories(liboccam)
 
 set (SOURCES
   src/auth.c

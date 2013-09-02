@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 {
     xmpp_ctx_t *ctx;
     xmpp_conn_t *conn;
-    xmpp_log_t *log;
+    occam_logger_t *log;
     char *jid, *pass;
 
     /* take a jid and password on the command line */
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
     xmpp_initialize();
 
     /* create a context */
-    log = xmpp_get_default_logger(XMPP_LEVEL_DEBUG); /* pass NULL instead to silence output */
+    log = xmpp_get_default_logger(OCCAM_LOG_LEVEL_DEBUG); /* pass NULL instead to silence output */
     ctx = xmpp_ctx_new(NULL, log);
 
     /* create a connection */

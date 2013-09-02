@@ -1,0 +1,3 @@
+[submodule "liboccam"]
+	path = liboccam
+	url = git@github.com:kassak/liboccam.git

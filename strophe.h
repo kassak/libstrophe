@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+#include <occam.h>
 
 /* namespace defines */
 /** @def XMPP_NS_CLIENT
@@ -115,36 +116,12 @@ int xmpp_version_check(int major, int minor);
    typedef SOCKET _xmpp_sock_t;
 #endif
 
-/* user-replaceable memory allocator */
-typedef struct _xmpp_mem_t xmpp_mem_t;
-
-/* user-replaceable log object */
-typedef struct _xmpp_log_t xmpp_log_t;
-
 /* opaque run time context containing the above hooks */
 typedef struct _xmpp_ctx_t xmpp_ctx_t;
 
-xmpp_ctx_t *xmpp_ctx_new(const xmpp_mem_t * const mem,
-			     const xmpp_log_t * const log);
+xmpp_ctx_t *xmpp_ctx_new(const occam_allocator_t * const mem,
+			     const occam_logger_t * const log);
 void xmpp_ctx_free(xmpp_ctx_t * const ctx);
-
-void *xmpp_alloc(const xmpp_ctx_t * const ctx, const size_t size);
-void xmpp_free(const xmpp_ctx_t * const ctx, void *p);
-void *xmpp_realloc(const xmpp_ctx_t * const ctx, void *p, const size_t size);
-
-struct _xmpp_mem_t {
-    void *(*alloc)(const size_t size, void * const userdata);
-    void (*free)(void *p, void * const userdata);
-    void *(*realloc)(void *p, const size_t size, void * const userdata);
-    void *userdata;
-};
-
-typedef enum {
-    XMPP_LEVEL_DEBUG,
-    XMPP_LEVEL_INFO,
-    XMPP_LEVEL_WARN,
-    XMPP_LEVEL_ERROR
-} xmpp_log_level_t;
 
 typedef enum {
     XMPP_UNKNOWN,
@@ -152,19 +129,8 @@ typedef enum {
     XMPP_COMPONENT
 } xmpp_conn_type_t;
 
-typedef void (*xmpp_log_handler)(void * const userdata,
-				 const xmpp_log_level_t level,
-				 const char * const area,
-				 const char * const msg);
-
-struct _xmpp_log_t {
-    xmpp_log_handler handler;
-    void *userdata;
-    /* mutex_t lock; */
-};
-
 /* return a default logger filtering at a given level */
-xmpp_log_t *xmpp_get_default_logger(xmpp_log_level_t level);
+occam_logger_t *xmpp_get_default_logger(occam_log_level_t level);
 
 /* connection */
 

@@ -24,8 +24,8 @@
 namespace XMPP {
     class Context {
     private:
-	xmpp_mem_t m_mem;
-	xmpp_log_t m_log;
+	occam_allocator_t m_mem;
+	occam_logger_t m_log;
 	xmpp_ctx_t *m_ctx;
 
     public:
@@ -35,9 +35,9 @@ namespace XMPP {
 	virtual void *alloc(const size_t size);
 	virtual void *realloc(void *p, const size_t size);
 	virtual void free(void *p);
-	virtual void log(const xmpp_log_level_t level,
+	virtual void log(const occam_log_level_t level,
 			 const char * const area,
-			 const char * const msg);
+			 const char * const fmt, va_list args);
 
 	xmpp_ctx_t *getContext();
 
@@ -47,9 +47,9 @@ namespace XMPP {
 				 void * const userdata);
 	static void callFree(void *p, void * const userdata);
 	static void callLog(void * const userdata, 
-			    const xmpp_log_level_t level,
+			    const occam_log_level_t level,
 			    const char * const area,
-			    const char * const msg);
+			    const char * const fmt, va_list args);
     };
 
     class Stanza {
