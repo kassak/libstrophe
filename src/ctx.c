@@ -159,8 +159,8 @@ static const occam_logger_t _xmpp_default_loggers[] = {
 occam_logger_t *xmpp_get_default_logger(occam_log_level_t level)
 {
     /* clamp to the known range */
-    if (level > OCCAM_LOG_LEVEL_ERROR) level = OCCAM_LOG_LEVEL_ERROR;
-    if (level < OCCAM_LOG_LEVEL_DEBUG) level = OCCAM_LOG_LEVEL_DEBUG;
+    if (level > OCCAM_LOG_LEVEL_LAST) level = OCCAM_LOG_LEVEL_LAST;
+    if (level < OCCAM_LOG_LEVEL_FIRST) level = OCCAM_LOG_LEVEL_FIRST;
 
     return (occam_logger_t*)&_xmpp_default_loggers[level];
 }
